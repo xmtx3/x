@@ -36,7 +36,7 @@ button{padding:12px 18px;border-radius:12px;border:none;background:#1bb36b;color
 let data=[], currentCategory="全部";
 const categories=["全部","通用","神经","头皮","呼吸","感冒","手部","肝肾胆肺","心血糖","腹部","脾胃","妇科","儿科","骨科","痛风关节"];
 
-fetch("data_fixed.json").then(r=>r.json()).then(d=>{data=d;initTabs();render();});
+fetch("data.json").then(r=>r.json()).then(d=>{data=d;initTabs();render();});
 
 function initTabs(){
   const box=document.getElementById("tabs");
