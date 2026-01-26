@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>象数疗法检索</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;margin:0;background:#f4f6f9}
+.container{max-width:900px;margin:0 auto;padding:16px}
+.header{background:#fff;border-radius:14px;padding:18px;text-align:center;font-size:22px;font-weight:600;margin-bottom:12px}
+.search{display:flex;gap:10px}
+input{flex:1;padding:12px 14px;border-radius:12px;border:1px solid #ddd;font-size:16px}
+button{padding:12px 18px;border-radius:12px;border:none;background:#1bb36b;color:#fff;font-size:16px}
+.count{color:#888;text-align:center;margin:8px 0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.tab{background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:14px;cursor:pointer}
+.tab.active{background:#1bb36b;color:#fff}
+.list .item{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px}
+.title{font-weight:600}
+.formula{color:#e5533d;font-size:18px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">象数疗法检索</div>
+  <div class="search">
+    <input id="search" placeholder="输入病名或配方数字...">
+    <button onclick="render()">搜索</button>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+let data=[], currentCategory="全部";
+const categories=["全部","通用","神经","头皮","呼吸","感冒","手部","肝肾胆肺","心血糖","腹部","脾胃","妇科","儿科","骨科","痛风关节"];
+
+fetch("data_fixed.json").then(r=>r.json()).then(d=>{data=d;initTabs();render();});
+
+function initTabs(){
+  const box=document.getElementById("tabs");
+  categories.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="tab"+(i===0?" active":"");
+    div.innerText=c;
+    div.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      div.classList.add("active"); currentCategory=c; render();
+    };
+    box.appendChild(div);
+  });
+}
+
+function mapCat(c){
+  const m={
+    "通用":"通用配方","神经":"神经类配方","头皮":"头部和皮肤配方","呼吸":"呼吸系统配方",
+    "感冒":"发烧感冒配方","手部":"手部配方","肝肾胆肺":"肝肾胆肺部配方","心血糖":"心脏血管糖尿病配方",
+    "腹部":"腹部配方","脾胃":"脾胃配方","妇科":"妇科配方","儿科":"儿科配方","骨科":"骨科配方","痛风关节":"痛风、关节炎配方"
+  };
+  return m[c]||c;
+}
+
+function render(){
+  const key=document.getElementById("search").value.trim();
+  let list=data.filter(d=>
+    (currentCategory==="全部"||d.category===mapCat(currentCategory)) &&
+    (d.title.includes(key)||d.formula.includes(key)||d.content.includes(key))
+  );
+  document.getElementById("count").innerText="已为您整理出 "+list.length+" 条有效配方";
+  const box=document.getElementById("list"); box.innerHTML="";
+  list.forEach(d=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`<div class="title">${d.title}</div>
+                   <div class="formula">${d.formula}</div>
+                   <div>${d.content}</div>`;
+    box.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
