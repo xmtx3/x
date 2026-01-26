@@ -6,104 +6,105 @@
     <title>八卦象数疗法检索</title>
     <style>
         :root {
-            --primary-color: #07c160; /* 微信绿，专业感 */
-            --accent-color: #e64340;  /* 配方红，醒目 */
+            --primary-color: #07c160; 
+            --accent-color: #e64340;  
             --bg-color: #f7f7f7;
+            --text-main: #333333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: #333; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 12px; }
 
-        /* 搜索头部分 */
-        .header { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .header h1 { font-size: 20px; text-align: center; margin-bottom: 15px; color: #000; }
+        /* 搜索头部 */
+        .header { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .header h1 { font-size: 22px; text-align: center; margin-bottom: 18px; color: #000; letter-spacing: 1px; }
         
-        .search-bar { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-box { display: flex; gap: 10px; }
         #search-input { 
-            flex: 1; padding: 12px 18px; border: 1px solid #e0e0e0; 
-            border-radius: 8px; background: #f5f5f5; font-size: 16px; outline: none;
+            flex: 1; padding: 14px 18px; border: 1.5px solid #eee; 
+            border-radius: 12px; background: #f9f9f9; font-size: 16px; outline: none; transition: 0.3s;
         }
+        #search-input:focus { border-color: var(--primary-color); background: #fff; }
         #search-btn { 
-            padding: 0 20px; background: var(--primary-color); color: #fff; 
-            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+            padding: 0 24px; background: var(--primary-color); color: #fff; 
+            border: none; border-radius: 12px; font-weight: bold; cursor: pointer;
         }
 
-        #result-count { font-size: 12px; color: #999; text-align: center; }
+        #result-count { font-size: 13px; color: #999; text-align: center; margin-top: 12px; }
 
-        /* 主体布局 */
-        .main-content { display: flex; gap: 15px; }
-
-        /* 侧边栏导航：手机端 3列网格，电脑端固定左侧 */
-        .sidebar { 
-            width: 240px; background: #fff; border-radius: 12px; padding: 10px; 
-            height: fit-content; position: sticky; top: 10px;
+        /* 分类网格：固定 3 列，整齐美观 */
+        .sidebar { margin-bottom: 20px; }
+        .category-list { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+            list-style: none;
         }
-        .category-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
         .category-item { 
-            padding: 12px; border-radius: 8px; cursor: pointer; text-align: center;
-            font-size: 14px; background: #fafafa; border: 1px solid #f0f0f0; transition: 0.2s;
+            padding: 12px 5px; border-radius: 10px; cursor: pointer; text-align: center;
+            font-size: 13px; background: #fff; border: 1px solid #efefef;
+            display: flex; align-items: center; justify-content: center;
+            height: 54px; color: #666; transition: 0.2s;
         }
-        .category-item.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: bold; }
+        .category-item.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); font-weight: bold; box-shadow: 0 4px 10px rgba(7,193,96,0.2); }
 
-        /* 内容区 */
-        .content-area { flex: 1; }
-        .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+        /* 卡片列表 */
+        .card-container { display: flex; flex-direction: column; gap: 12px; }
         
-        /* 卡片设计：参考同行图片 */
         .card { 
-            background: #fff; border-radius: 12px; padding: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;
+            background: #fff; border-radius: 16px; padding: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f0f0f0;
         }
-        .card-title { 
-            font-size: 18px; font-weight: bold; color: #333; 
-            display: flex; align-items: center; gap: 8px;
-        }
-        .card-title::before { content: ""; display: inline-block; width: 4px; height: 18px; background: var(--primary-color); border-radius: 2px; }
         
+        /* 标题统一字号，不忽大忽小 */
+        .card-title { 
+            font-size: 18px; font-weight: bold; color: #222; 
+            margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px;
+            line-height: 1.4;
+        }
+        .card-title::before { content: ""; flex-shrink: 0; width: 4px; height: 18px; background: var(--primary-color); border-radius: 2px; margin-top: 4px; }
+        
+        /* 配方区域 */
         .formula-box { 
-            background: #fff5f5; border: 1px dashed #ffcdd2; 
-            padding: 15px; border-radius: 10px; text-align: center; margin: 5px 0;
+            background: #fff8f8; border: 1px solid #ffebee; 
+            padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 15px;
         }
         .formula { 
-            color: var(--accent-color); font-size: 28px; font-weight: 800; 
-            letter-spacing: 2px; font-family: "Georgia", serif; 
+            color: var(--accent-color); font-size: 26px; font-weight: 800; 
+            letter-spacing: 1.5px; font-family: "Courier New", Courier, monospace;
         }
-        .desc { font-size: 14px; color: #666; line-height: 1.5; padding-top: 8px; border-top: 1px solid #f5f5f5; }
+        
+        /* 解释说明区域 */
+        .desc-box { 
+            background: #fcfcfc; border-top: 1px solid #f5f5f5; 
+            padding-top: 12px; font-size: 15px; color: #555;
+        }
+        .desc-label { color: var(--primary-color); font-weight: bold; margin-right: 6px; font-size: 13px; }
+        .desc-text { line-height: 1.6; }
 
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            .main-content { flex-direction: column; }
-            .sidebar { width: 100%; position: static; background: transparent; padding: 0; }
-            .category-list { 
-                display: grid; grid-template-columns: repeat(3, 1fr); /* 3列网格，15个正好5行 */
-                gap: 8px; 
-            }
-            .category-item { font-size: 13px; padding: 10px 5px; min-height: 50px; display: flex; align-items: center; justify-content: center; background: #fff; }
-            .card-container { grid-template-columns: 1fr; }
-            .formula { font-size: 24px; }
+        @media (max-width: 400px) {
+            .category-item { font-size: 12px; }
+            .formula { font-size: 22px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>八卦象数疗法检索</h1>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="输入病名、症状或数字...">
+            <h1>八卦象数疗法检索大全</h1>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="输入病症、描述或配方数字...">
                 <button id="search-btn">搜索</button>
             </div>
-            <div id="result-count">数据加载中...</div>
+            <div id="result-count">正在同步 PDF 精准数据...</div>
         </div>
 
-        <div class="main-content">
-            <nav class="sidebar">
-                <ul class="category-list" id="category-list"></ul>
-            </nav>
-            <main class="content-area">
-                <div class="card-container" id="card-container"></div>
-            </main>
-        </div>
+        <nav class="sidebar">
+            <ul class="category-list" id="category-list"></ul>
+        </nav>
+
+        <main class="card-container" id="card-container"></main>
     </div>
 
     <script>
@@ -112,26 +113,30 @@
         async function init() {
             try {
                 const res = await fetch('data.json');
-                therapyData = await res.json();
+                const rawData = await res.json();
+                // 过滤掉误读的纯页码（例如公式只有2位数的）
+                therapyData = rawData.filter(item => item.formula && item.formula.length > 2);
+                
                 renderSidebar();
                 renderCards(therapyData);
-                document.getElementById('result-count').innerText = `共加载 ${therapyData.length} 条精准配方`;
+                document.getElementById('result-count').innerText = `已为您匹配到 ${therapyData.length} 条精准配方`;
             } catch (e) {
-                document.getElementById('result-count').innerText = "加载失败，请确保 data.json 与 HTML 在同一文件夹";
+                document.getElementById('result-count').innerText = "数据加载异常，请检查 JSON 文件";
             }
         }
 
         function renderSidebar() {
             const list = document.getElementById('category-list');
-            // 获取分类并排除“通用”
-            const exclude = ["通用", "通用配方", "说明", "注意事项"];
+            const exclude = ["通用", "说明", "页码", "注意事项"];
             let cats = [...new Set(therapyData.map(i => i.category))];
-            cats = cats.filter(c => c && !exclude.some(ex => c.includes(ex))).slice(0, 14);
             
+            // 过滤无效分类并精准截取，确保加上“全部”后总数是 15 个
+            cats = cats.filter(c => c && !exclude.some(ex => c.includes(ex))).slice(0, 14);
             const finalCats = ["全部内容", ...cats];
+            
             list.innerHTML = finalCats.map(cat => `
                 <li class="category-item ${cat==='全部内容'?'active':''}" onclick="filterByCat('${cat}', this)">
-                    ${cat}
+                    ${cat.replace('配方','') }
                 </li>
             `).join('');
         }
@@ -139,17 +144,19 @@
         function renderCards(data) {
             const container = document.getElementById('card-container');
             if (data.length === 0) {
-                container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:50px; color:#999;">未找到匹配内容</div>';
+                container.innerHTML = '<div style="text-align:center; padding:50px; color:#999;">未找到相关配方</div>';
                 return;
             }
-            container.innerHTML = data.slice(0, 300).map(item => `
+
+            container.innerHTML = data.map(item => `
                 <div class="card">
                     <div class="card-title">${item.title}</div>
                     <div class="formula-box">
-                        <span class="formula">${item.formula}</span>
+                        <div class="formula">${item.formula}</div>
                     </div>
-                    <div class="desc">
-                        ${item.content || '请按节律默念，点号处停顿。'}
+                    <div class="desc-box">
+                        <span class="desc-label">【详细解释】</span>
+                        <span class="desc-text">${item.content || '见上文描述。'}</span>
                     </div>
                 </div>
             `).join('');
@@ -158,25 +165,24 @@
         function filterByCat(cat, el) {
             document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-            const filtered = cat === "全部内容" ? therapyData : therapyData.filter(i => i.category === cat);
+            const filtered = (cat === "全部内容") ? therapyData : therapyData.filter(i => i.category === cat);
             renderCards(filtered);
-            if (window.innerWidth < 768) window.scrollTo({ top: document.querySelector('.content-area').offsetTop - 10, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 搜索功能逻辑
-        function search() {
+        function handleSearch() {
             const kw = document.getElementById('search-input').value.trim().toLowerCase();
-            const res = therapyData.filter(i => 
+            const filtered = therapyData.filter(i => 
                 i.title.toLowerCase().includes(kw) || 
                 i.formula.includes(kw) ||
                 (i.content && i.content.toLowerCase().includes(kw))
             );
-            renderCards(res);
-            document.getElementById('result-count').innerText = `找到 ${res.length} 条相关配方`;
+            renderCards(filtered);
+            document.getElementById('result-count').innerText = `搜索结果：${filtered.length} 条`;
         }
 
-        document.getElementById('search-btn').onclick = search;
-        document.getElementById('search-input').onkeyup = (e) => { if(e.key === 'Enter') search(); };
+        document.getElementById('search-btn').onclick = handleSearch;
+        document.getElementById('search-input').onkeyup = (e) => { if(e.key === 'Enter') handleSearch(); };
 
         init();
     </script>
