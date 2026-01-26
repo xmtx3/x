@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八卦象数疗法大全 - 极速检索版</title>
+    <style>
+        /* 保持你之前的样式，并增加以下性能优化样式 */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft YaHei", sans-serif; }
+        body { background-color: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        .header { text-align: center; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .disclaimer { background-color: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; font-size: 14px; margin: 10px 0; }
+        .search-bar { position: relative; margin: 15px 0; }
+        #search-input { width: 100%; max-width: 600px; padding: 12px 20px; border: 2px solid #007bff; border-radius: 30px; font-size: 16px; outline: none; }
+        .main-content { display: flex; gap: 20px; }
+        .sidebar { width: 280px; background-color: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 85vh; position: sticky; top: 20px; overflow-y: auto; }
+        .category-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.3s; list-style: none; margin-bottom: 5px; }
+        .category-item:hover, .category-item.active { background-color: #e6f7ff; color: #007bff; font-weight: bold; }
+        .content-area { flex: 1; }
+        .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .card { background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .formula { color: #dc3545; font-weight: bold; font-size: 1.1em; letter-spacing: 1px; }
+        .note { color: #666; font-size: 13px; background: #f9f9f9; padding: 8px; border-radius: 4px; margin-top: 10px; }
+        .loading { text-align: center; padding: 50px; font-size: 18px; color: #007bff; }
+        /* 移动端适配 */
+        @media (max-width: 768px) { .main-content { flex-direction: column; } .sidebar { width: 100%; height: auto; position: relative; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>八卦象数疗法大全</h1>
+            <div class="disclaimer">⚠️ 本内容为参考，不替代医疗建议。请在专业人士指导下使用。</div>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="输入病症、配方、关键词... (支持实时搜索)">
+            </div>
+            <div id="result-count">正在加载数据...</div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3 style="margin-bottom:15px; color:#007bff;">分类导航</h3>
+                <ul id="category-list"></ul>
+            </div>
+            <div class="content-area">
+                <div class="card-container" id="card-container">
+                    <div class="loading">数据读取中，请稍候...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let therapyData = []; // 存储原始数据
+
+        // 1. 异步获取 JSON 数据
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                if (!response.ok) throw new Error('无法加载数据文件');
+                therapyData = await response.json();
+                
+                initPage();
+            } catch (err) {
+                document.getElementById('card-container').innerHTML = `<div style="color:red">加载失败: ${err.message}<br>请确保 index.html 和 data.json 放在同一个文件夹下。</div>`;
+            }
+        }
+
+        function initPage() {
+            generateSidebar();
+            renderCards(therapyData);
+            updateResultCount(therapyData.length);
+        }
+
+        // 2. 渲染卡片 (性能优化版)
+        function renderCards(data) {
+            const container = document.getElementById('card-container');
+            // 只显示前 500 条，防止一次性渲染几千条导致浏览器卡死
+            const limitData = data.slice(0, 500); 
+            
+            container.innerHTML = limitData.map(item => `
+                <div class="card">
+                    <div style="font-weight:bold; margin-bottom:8px;">${item.title}</div>
+                    <div><span class="formula">${item.formula}</span></div>
+                    <div style="font-size:14px; margin-top:8px;">${item.content}</div>
+                    <div class="note">分类：${item.category}</div>
+                </div>
+            `).join('');
+
+            if (data.length > 500) {
+                container.innerHTML += `<div style="grid-column:1/-1; text-align:center; padding:20px; color:#999;">更多结果请通过搜索或分类筛选...</div>`;
+            }
+            if (data.length === 0) {
+                container.innerHTML = '<div class="loading">未找到匹配项</div>';
+            }
+        }
+
+        // 3. 自动生成分类导航
+        function generateSidebar() {
+            const list = document.getElementById('category-list');
+            const categories = ["all", ...new Set(therapyData.map(item => item.category))];
+            
+            list.innerHTML = categories.map(cat => `
+                <li class="category-item ${cat === 'all' ? 'active' : ''}" 
+                    onclick="filterByCategory('${cat}', this)">
+                    ${cat === 'all' ? '全部内容' : cat}
+                </li>
+            `).join('');
+        }
+
+        // 4. 分类过滤
+        function filterByCategory(cat, el) {
+            document.querySelectorAll('.category-item').forEach(li => li.classList.remove('active'));
+            el.classList.add('active');
+            
+            const filtered = cat === 'all' ? therapyData : therapyData.filter(i => i.category === cat);
+            renderCards(filtered);
+            updateResultCount(filtered.length);
+        }
+
+        // 5. 搜索功能 (防抖优化)
+        let timer;
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const kw = e.target.value.toLowerCase();
+                const filtered = therapyData.filter(item => 
+                    item.title.toLowerCase().includes(kw) || 
+                    item.formula.includes(kw) || 
+                    item.content.toLowerCase().includes(kw)
+                );
+                renderCards(filtered);
+                updateResultCount(filtered.length);
+            }, 300);
+        });
+
+        function updateResultCount(count) {
+            document.getElementById('result-count').innerText = `共找到 ${count} 条记录`;
+        }
+
+        // 启动加载
+        loadData();
+    </script>
+</body>
+</html>
