@@ -5,79 +5,255 @@
 <title>象数疗法检索</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;margin:0;background:#f4f6f9}
-.container{max-width:900px;margin:0 auto;padding:16px}
-.header{background:#fff;border-radius:14px;padding:18px;text-align:center;font-size:22px;font-weight:600;margin-bottom:12px}
-.search{display:flex;gap:10px}
-input{flex:1;padding:12px 14px;border-radius:12px;border:1px solid #ddd;font-size:16px}
-button{padding:12px 18px;border-radius:12px;border:none;background:#1bb36b;color:#fff;font-size:16px}
-.count{color:#888;text-align:center;margin:8px 0}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
-.tab{background:#fff;border-radius:12px;padding:10px;text-align:center;font-size:14px;cursor:pointer}
-.tab.active{background:#1bb36b;color:#fff}
-.list .item{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px}
-.title{font-weight:600}
-.formula{color:#e5533d;font-size:18px;margin:6px 0}
+  /* 基础背景与字体 */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    background: #f7f8fa; /* 还原图片背景色 */
+    color: #333;
+  }
+  .container {
+    max-width: 600px; /* 适配移动端观感 */
+    margin: 0 auto;
+    padding: 20px 16px;
+  }
+
+  /* 标题样式 */
+  .header {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #000;
+  }
+
+  /* 搜索框区域 - 卡片化 */
+  .search-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    margin-bottom: 15px;
+  }
+  .search {
+    display: flex;
+    gap: 10px;
+  }
+  input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    background: #f9f9f9;
+    font-size: 16px;
+    outline: none;
+  }
+  button {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    background: #59c77c; /* 还原图片绿色 */
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* 统计文字 */
+  .count {
+    color: #999;
+    text-align: center;
+    font-size: 13px;
+    margin-bottom: 15px;
+  }
+
+  /* 15个标签样式 - 3列布局 */
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    background: #fff;
+    border-radius: 8px;
+    padding: 15px 5px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 20px;
+  }
+  .tab.active {
+    background: #59c77c;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* 列表项样式 */
+  .list .item {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+  .title {
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 10px;
+  }
+  .formula {
+    color: #d9534f; /* 配方数字颜色 */
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px 0;
+    letter-spacing: 1px;
+  }
+  .content-text {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* 图片底部的说明卡片样式 */
+  .info-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    border-left: 5px solid #59c77c; /* 侧边绿条 */
+  }
+  .info-title {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+  }
+  .info-example {
+    background: #fff5f5;
+    border: 1px dashed #ffcfcf;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    color: #d9534f;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .info-footer {
+    font-size: 13px;
+    color: #59c77c;
+  }
+  .info-desc {
+    color: #888;
+    font-size: 13px;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
   <div class="header">象数疗法检索</div>
-  <div class="search">
-    <input id="search" placeholder="输入病名或配方数字...">
-    <button onclick="render()">搜索</button>
+  
+  <div class="search-container">
+    <div class="search">
+      <input id="search" placeholder="输入病名搜索...">
+      <button onclick="render()">搜索</button>
+    </div>
   </div>
-  <div class="count" id="count"></div>
+
+  <div class="count" id="count">正在加载数据...</div>
+
   <div class="tabs" id="tabs"></div>
+
   <div class="list" id="list"></div>
+
+  <div id="instruction" class="info-card">
+    <div class="info-title">有一圆点不读，只作为停顿一个音符的时间。例如读作</div>
+    <div class="info-example">650·3820</div>
+    <div class="info-footer">说明建议：</div>
+    <div class="info-desc">见上方描述</div>
+  </div>
 </div>
 
 <script>
-let data=[], currentCategory="全部";
-const categories=["全部","通用","神经","头皮","呼吸","感冒","手部","肝肾胆肺","心血糖","腹部","脾胃","妇科","儿科","骨科","痛风关节"];
+let data = [], currentCategory = "全部";
+// 保持原有的 15 个分类名称
+const categories = ["全部", "通用", "神经", "头皮", "呼吸", "感冒", "手部", "肝肾胆肺", "心血糖", "腹部", "脾胃", "妇科", "儿科", "骨科", "痛风关节"];
 
-fetch("data.json").then(r=>r.json()).then(d=>{data=d;initTabs();render();});
+// 修改数据地址为 data.json
+fetch("data.json")
+  .then(r => r.json())
+  .then(d => {
+    data = d;
+    initTabs();
+    render();
+  })
+  .catch(err => {
+    document.getElementById("count").innerText = "数据加载失败，请检查 data.json";
+  });
 
-function initTabs(){
-  const box=document.getElementById("tabs");
-  categories.forEach((c,i)=>{
-    const div=document.createElement("div");
-    div.className="tab"+(i===0?" active":"");
-    div.innerText=c;
-    div.onclick=()=>{
-      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-      div.classList.add("active"); currentCategory=c; render();
+function initTabs() {
+  const box = document.getElementById("tabs");
+  categories.forEach((c, i) => {
+    const div = document.createElement("div");
+    // 第一个默认选中，显示“全部内容”样式的逻辑
+    div.className = "tab" + (i === 0 ? " active" : "");
+    div.innerText = i === 0 ? "全部内容" : c; 
+    div.onclick = () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      div.classList.add("active");
+      currentCategory = c;
+      render();
     };
     box.appendChild(div);
   });
 }
 
-function mapCat(c){
-  const m={
-    "通用":"通用配方","神经":"神经类配方","头皮":"头部和皮肤配方","呼吸":"呼吸系统配方",
-    "感冒":"发烧感冒配方","手部":"手部配方","肝肾胆肺":"肝肾胆肺部配方","心血糖":"心脏血管糖尿病配方",
-    "腹部":"腹部配方","脾胃":"脾胃配方","妇科":"妇科配方","儿科":"儿科配方","骨科":"骨科配方","痛风关节":"痛风、关节炎配方"
+// 保持原有的映射逻辑不变
+function mapCat(c) {
+  const m = {
+    "通用": "通用配方", "神经": "神经类配方", "头皮": "头部和皮肤配方", "呼吸": "呼吸系统配方",
+    "感冒": "发烧感冒配方", "手部": "手部配方", "肝肾胆肺": "肝肾胆肺部配方", "心血糖": "心脏血管糖尿病配方",
+    "腹部": "腹部配方", "脾胃": "脾胃配方", "妇科": "妇科配方", "儿科": "儿科配方", "骨科": "骨科配方", "痛风关节": "痛风、关节炎配方"
   };
-  return m[c]||c;
+  return m[c] || c;
 }
 
-function render(){
-  const key=document.getElementById("search").value.trim();
-  let list=data.filter(d=>
-    (currentCategory==="全部"||d.category===mapCat(currentCategory)) &&
-    (d.title.includes(key)||d.formula.includes(key)||d.content.includes(key))
+function render() {
+  const key = document.getElementById("search").value.trim();
+  const box = document.getElementById("list");
+  const instr = document.getElementById("instruction");
+  
+  let list = data.filter(d =>
+    (currentCategory === "全部" || d.category === mapCat(currentCategory)) &&
+    (d.title.includes(key) || d.formula.includes(key) || d.content.includes(key))
   );
-  document.getElementById("count").innerText="已为您整理出 "+list.length+" 条有效配方";
-  const box=document.getElementById("list"); box.innerHTML="";
-  list.forEach(d=>{
-    const div=document.createElement("div");
-    div.className="item";
-    div.innerHTML=`<div class="title">${d.title}</div>
-                   <div class="formula">${d.formula}</div>
-                   <div>${d.content}</div>`;
+
+  document.getElementById("count").innerText = "已为您整理出 " + list.length + " 条有效配方";
+  box.innerHTML = "";
+
+  // 如果有搜索结果，隐藏底部的说明卡片以保持整洁
+  instr.style.display = (key === "" && currentCategory === "全部") ? "block" : "none";
+
+  list.forEach(d => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `
+      <div class="title">${d.title}</div>
+      <div class="formula">${d.formula}</div>
+      <div class="content-text">${d.content}</div>
+    `;
     box.appendChild(div);
   });
 }
 </script>
+
 </body>
 </html>
