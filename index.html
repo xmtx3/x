@@ -9,11 +9,11 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
-    background: #f7f8fa; /* 还原图片背景色 */
+    background: #f7f8fa; 
     color: #333;
   }
   .container {
-    max-width: 600px; /* 适配移动端观感 */
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px 16px;
   }
@@ -27,7 +27,7 @@
     color: #000;
   }
 
-  /* 搜索框区域 - 卡片化 */
+  /* 搜索框区域 */
   .search-container {
     background: #fff;
     padding: 20px;
@@ -52,7 +52,7 @@
     padding: 12px 24px;
     border-radius: 10px;
     border: none;
-    background: #59c77c; /* 还原图片绿色 */
+    background: #59c77c; 
     color: #fff;
     font-size: 16px;
     cursor: pointer;
@@ -66,7 +66,7 @@
     margin-bottom: 15px;
   }
 
-  /* 15个标签样式 - 3列布局 */
+  /* 15个标签样式 */
   .tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -86,12 +86,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 20px;
   }
   .tab.active {
-    background: #59c77c;
+    background: #76c68a; /* 还原图片激活态绿色 */
     color: #fff;
-    font-weight: 500;
   }
 
   /* 列表项样式 */
@@ -108,7 +106,7 @@
     margin-bottom: 10px;
   }
   .formula {
-    color: #d9534f; /* 配方数字颜色 */
+    color: #d9534f;
     font-size: 22px;
     font-weight: bold;
     margin: 10px 0;
@@ -120,13 +118,13 @@
     line-height: 1.6;
   }
 
-  /* 图片底部的说明卡片样式 */
+  /* 底部说明卡片 */
   .info-card {
     background: #fff;
     border-radius: 16px;
     padding: 20px;
     margin-top: 20px;
-    border-left: 5px solid #59c77c; /* 侧边绿条 */
+    border-left: 5px solid #59c77c;
   }
   .info-title {
     font-weight: bold;
@@ -184,10 +182,10 @@
 
 <script>
 let data = [], currentCategory = "全部";
-// 保持原有的 15 个分类名称
+// 保持你要求的 15 个名字
 const categories = ["全部", "通用", "神经", "头皮", "呼吸", "感冒", "手部", "肝肾胆肺", "心血糖", "腹部", "脾胃", "妇科", "儿科", "骨科", "痛风关节"];
 
-// 修改数据地址为 data.json
+// 使用 data.json
 fetch("data.json")
   .then(r => r.json())
   .then(d => {
@@ -196,14 +194,13 @@ fetch("data.json")
     render();
   })
   .catch(err => {
-    document.getElementById("count").innerText = "数据加载失败，请检查 data.json";
+    document.getElementById("count").innerText = "加载失败，请检查 data.json 文件";
   });
 
 function initTabs() {
   const box = document.getElementById("tabs");
   categories.forEach((c, i) => {
     const div = document.createElement("div");
-    // 第一个默认选中，显示“全部内容”样式的逻辑
     div.className = "tab" + (i === 0 ? " active" : "");
     div.innerText = i === 0 ? "全部内容" : c; 
     div.onclick = () => {
@@ -216,7 +213,6 @@ function initTabs() {
   });
 }
 
-// 保持原有的映射逻辑不变
 function mapCat(c) {
   const m = {
     "通用": "通用配方", "神经": "神经类配方", "头皮": "头部和皮肤配方", "呼吸": "呼吸系统配方",
@@ -231,15 +227,16 @@ function render() {
   const box = document.getElementById("list");
   const instr = document.getElementById("instruction");
   
+  // 修正后的过滤逻辑：增加对原始名字 currentCategory 的直接匹配，防止映射失败
   let list = data.filter(d =>
-    (currentCategory === "全部" || d.category === mapCat(currentCategory)) &&
+    (currentCategory === "全部" || d.category === mapCat(currentCategory) || d.category === currentCategory) &&
     (d.title.includes(key) || d.formula.includes(key) || d.content.includes(key))
   );
 
   document.getElementById("count").innerText = "已为您整理出 " + list.length + " 条有效配方";
   box.innerHTML = "";
 
-  // 如果有搜索结果，隐藏底部的说明卡片以保持整洁
+  // 仅在全部内容且未搜索时显示底部说明板
   instr.style.display = (key === "" && currentCategory === "全部") ? "block" : "none";
 
   list.forEach(d => {
